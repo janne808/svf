@@ -174,7 +174,7 @@ void SVFPlugin::processReplacing (float** inputs, float** outputs, VstInt32 samp
     
     while (--sampleFrames >= 0)
     {
-      svf->SVFfilter((double)((*in1++) * fGain));
+      svf->SVFfilter((double)((*in1++) * 0.25 * fGain));
       (*out1++) = (float)(svf->GetFilterOutput());
     }
 }
@@ -188,7 +188,7 @@ void SVFPlugin::processDoubleReplacing (double** inputs, double** outputs, VstIn
 
     while (--sampleFrames >= 0)
     {
-      svf->SVFfilter((double)((*in1++) * dGain));
+      svf->SVFfilter((double)((*in1++) * 0.25 * dGain));
       (*out1++) = (double)(svf->GetFilterOutput());
     }
 }

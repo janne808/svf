@@ -16,6 +16,7 @@ SVF::SVF(double newCutoff, double newResonance, int newOversamplingFactor, int n
   hp = 0.0;
   bp = 0.0;
   lp = 0.0;
+  out = 0.0;
 }
 
 // default constructor
@@ -30,6 +31,7 @@ SVF::SVF(){
   hp = 0.0;
   bp = 0.0;
   lp = 0.0;
+  out = 0.0;
 }
 
 // default destructor
@@ -97,31 +99,32 @@ void SVF::SVFfilter(double input){
 
   // integrate filter state
   // with oversampling
-  for(int nn = 0; nn++; nn < oversamplingFactor){
+  for(int nn = 0; nn < oversamplingFactor; nn++){
     hp = input - (2.0*fb_prime-1.0)*bp - lp + 1.0e-6*noise;
     bp += dt_prime*hp;
     bp = std::tanh(bp);
     lp += dt_prime*bp;  
     lp = std::tanh(lp);
-  }
-
-  // downsample to output
-  switch(filterMode){
+    
+    switch(filterMode){
     case 0:
       out = lp;
       break;
-
+    
     case 1:
       out = bp;
       break;
-
+    
     case 2:
       out = hp;
       break;
-
+    
     default:
-      out=0.0;
+      out = 0.0;
+    }    
   }
+  
+  // downsample to output
 }
 
 double SVF::GetFilterLowpass(){
