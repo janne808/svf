@@ -46,6 +46,10 @@ void SVF::SetFilterOversamplingFactor(int newOversamplingFactor){
   oversamplingFactor=newOversamplingFactor;
 }
 
+void SVF::SetFilterMode(int newFilterMode){
+  filterMode=newFilterMode;
+}
+
 double SVF::GetFilterCutoff(){
   return cutoffFrequency;
 }
@@ -58,11 +62,17 @@ int SVF::GetFilterOversamplingFactor(){
   return oversamplingFactor;
 }
 
+double SVF::GetFilterOutput(){
+  return out;
+}
+
+int SVF::GetFilterMode(){
+  return filterMode;
+}
+
 void SVF::SVFfilter(double input){
-  // noise terms
+  // noise term
   double noise;
-  double noise2;
-  double noise3;
 
   // integration rate
   double dt = 0.001+1.75*(cutoffFrequency*cutoffFrequency*
@@ -82,17 +92,19 @@ void SVF::SVFfilter(double input){
   // update noise terms
   noise = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
   noise = 2.0*(noise - 0.5);
-  noise2 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-  noise2 = 2.0*(noise - 0.5);
-  noise3 = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-  noise3 = 2.0*(noise - 0.5);
 
   // integrate filter state
-  hp = input - (2.0*fb_prime-1.0)*bp - lp + 1.0e-6*noise;
-  bp += dt_prime*hp;
-  bp = std::tanh((1.0003335 + 1.0e-4*noise2)*bp);
-  lp += dt_prime*bp;  
-  lp = std::tanh((1.0002232 + 1.0e-4*noise3)*lp);
+  // with oversampling
+  for(int nn=0; nn++; nn<oversamplingFactor){
+    hp = input - (2.0*fb_prime-1.0)*bp - lp + 1.0e-6*noise;
+    bp += dt_prime*hp;
+    bp = std::tanh(bp);
+    lp += dt_prime*bp;  
+    lp = std::tanh(lp);
+  }
+
+  // downsample
+  out = lp;
 }
 
 double SVF::GetFilterLowpass(){
