@@ -27,7 +27,7 @@ SVFPlugin::SVFPlugin (audioMasterCallback audioMaster)
 	vst_strncpy (programName, "Default", kVstMaxProgNameLen);	// default program name
 
 	// instantiate SVF class
-	svf = new SVF((double)(fCutoff), (double)(fResonance), 1);
+	svf = new SVF((double)(fCutoff), (double)(fResonance), 1, 0);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ void SVFPlugin::processReplacing (float** inputs, float** outputs, VstInt32 samp
     while (--sampleFrames >= 0)
     {
       svf->SVFfilter((double)((*in1++) * fGain));
-      (*out1++) = (float)(svf->GetFilterLowpass());
+      (*out1++) = (float)(svf->GetFilterOutput());
     }
 }
 
@@ -189,6 +189,6 @@ void SVFPlugin::processDoubleReplacing (double** inputs, double** outputs, VstIn
     while (--sampleFrames >= 0)
     {
       svf->SVFfilter((double)((*in1++) * dGain));
-      (*out1++) = (double)(svf->GetFilterLowpass());
+      (*out1++) = (double)(svf->GetFilterOutput());
     }
 }

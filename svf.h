@@ -6,7 +6,7 @@
 class SVF{
 public:
   // constructor/destructor
-  SVF(double newCutoff, double newResonance, int newOversamplingFactor);
+  SVF(double newCutoff, double newResonance, int newOversamplingFactor, int newFilterMode);
   SVF();
   ~SVF();
 

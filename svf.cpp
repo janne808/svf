@@ -5,29 +5,31 @@
 #include "svf.h"
 
 // constructor
-SVF::SVF(double newCutoff, double newResonance, int newOversamplingFactor){
+SVF::SVF(double newCutoff, double newResonance, int newOversamplingFactor, int newFilterMode){
   // initialize filter parameters
-  cutoffFrequency=newCutoff;
-  Resonance=newResonance;
-  oversamplingFactor=newOversamplingFactor;
+  cutoffFrequency = newCutoff;
+  Resonance = newResonance;
+  oversamplingFactor = newOversamplingFactor;
+  filterMode = newFilterMode;
 
   // initialize filter state
-  hp=0.0;
-  bp=0.0;
-  lp=0.0;
+  hp = 0.0;
+  bp = 0.0;
+  lp = 0.0;
 }
 
 // default constructor
 SVF::SVF(){
   // initialize filter parameters
-  cutoffFrequency=0.25;
-  Resonance=0.5;
-  oversamplingFactor=1;
-
+  cutoffFrequency = 0.25;
+  Resonance = 0.5;
+  oversamplingFactor = 1;
+  filterMode = 0;
+  
   // initialize filter state
-  hp=0.0;
-  bp=0.0;
-  lp=0.0;
+  hp = 0.0;
+  bp = 0.0;
+  lp = 0.0;
 }
 
 // default destructor
@@ -35,19 +37,19 @@ SVF::~SVF(){
 }
 
 void SVF::SetFilterCutoff(double newCutoff){
-  cutoffFrequency=newCutoff;
+  cutoffFrequency = newCutoff;
 }
 
 void SVF::SetFilterResonance(double newResonance){
-  Resonance=newResonance;
+  Resonance = newResonance;
 }
 
 void SVF::SetFilterOversamplingFactor(int newOversamplingFactor){
-  oversamplingFactor=newOversamplingFactor;
+  oversamplingFactor = newOversamplingFactor;
 }
 
 void SVF::SetFilterMode(int newFilterMode){
-  filterMode=newFilterMode;
+  filterMode = newFilterMode;
 }
 
 double SVF::GetFilterCutoff(){
@@ -91,11 +93,11 @@ void SVF::SVFfilter(double input){
    
   // update noise terms
   noise = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-  noise = 2.0*(noise - 0.5);
+  noise = 2.0 * (noise - 0.5);
 
   // integrate filter state
   // with oversampling
-  for(int nn=0; nn++; nn<oversamplingFactor){
+  for(int nn = 0; nn++; nn < oversamplingFactor){
     hp = input - (2.0*fb_prime-1.0)*bp - lp + 1.0e-6*noise;
     bp += dt_prime*hp;
     bp = std::tanh(bp);
@@ -103,8 +105,23 @@ void SVF::SVFfilter(double input){
     lp = std::tanh(lp);
   }
 
-  // downsample
-  out = lp;
+  // downsample to output
+  switch(filterMode){
+    case 0:
+      out = lp;
+      break;
+
+    case 1:
+      out = bp;
+      break;
+
+    case 2:
+      out = hp;
+      break;
+
+    default:
+      out=0.0;
+  }
 }
 
 double SVF::GetFilterLowpass(){
