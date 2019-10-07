@@ -38,6 +38,8 @@ protected:
   float fCutoff;
   float fResonance;
 
+  float fSampleRate;
+  
   char programName[kVstMaxProgNameLen + 1];
 
   SVF *svf;

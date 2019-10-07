@@ -14,13 +14,15 @@ SVFPlugin::SVFPlugin (audioMasterCallback audioMaster)
 {
 	setNumInputs (1);		// stereo in
 	setNumOutputs (1);		// stereo out
-	setUniqueID ('SVF');	// identify
-	canProcessReplacing ();	// supports replacing output
-	canDoubleReplacing ();	// supports double precision processing
+	setUniqueID ('SVF');	        // identify
+	canProcessReplacing ();	        // supports replacing output
+	canDoubleReplacing ();	        // supports double precision processing
 
 	fGain = 1.f;			// default to 0 dB
 	fCutoff = 0.125f;
 	fResonance = 0.5f;
+
+	fSampleRate = 44100.0f;
 	
 	vst_strncpy (programName, "Default", kVstMaxProgNameLen);	// default program name
 
@@ -37,6 +39,7 @@ SVFPlugin::~SVFPlugin ()
 //-------------------------------------------------------------------------------------------------------
 void SVFPlugin::setSampleRate (float sampleRate)
 {
+  fSampleRate = sampleRate;
 }
 
 //-------------------------------------------------------------------------------------------------------
