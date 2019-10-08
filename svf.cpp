@@ -3,20 +3,25 @@
 #include <cstdlib>
 #include <cmath>
 #include "svf.h"
+#include "fir.h"
 
 // constructor
-SVF::SVF(double newCutoff, double newResonance, int newOversamplingFactor, int newFilterMode){
+SVF::SVF(double newCutoff, double newResonance, int newOversamplingFactor, int newFilterMode, double newSampleRate){
   // initialize filter parameters
   cutoffFrequency = newCutoff;
   Resonance = newResonance;
   oversamplingFactor = newOversamplingFactor;
   filterMode = newFilterMode;
+  sampleRate = newSampleRate;
 
   // initialize filter state
   hp = 0.0;
   bp = 0.0;
   lp = 0.0;
   out = 0.0;
+
+  // instantiate downsampling filter
+  fir = new FIRLowpass(sampleRate * oversamplingFactor, (sampleRate / (double)(oversamplingFactor)), 32);
 }
 
 // default constructor
@@ -24,18 +29,23 @@ SVF::SVF(){
   // initialize filter parameters
   cutoffFrequency = 0.25;
   Resonance = 0.5;
-  oversamplingFactor = 1;
+  oversamplingFactor = 4;
   filterMode = 0;
+  sampleRate = 44100.0;
   
   // initialize filter state
   hp = 0.0;
   bp = 0.0;
   lp = 0.0;
   out = 0.0;
+
+  // instantiate downsampling filter
+  fir = new FIRLowpass(sampleRate * oversamplingFactor, (sampleRate / (double)(oversamplingFactor)), 32);
 }
 
 // default destructor
 SVF::~SVF(){
+  delete fir;
 }
 
 void SVF::SetFilterCutoff(double newCutoff){
@@ -48,10 +58,17 @@ void SVF::SetFilterResonance(double newResonance){
 
 void SVF::SetFilterOversamplingFactor(int newOversamplingFactor){
   oversamplingFactor = newOversamplingFactor;
+  fir->SetFilterSamplerate(sampleRate * oversamplingFactor);
 }
 
 void SVF::SetFilterMode(int newFilterMode){
   filterMode = newFilterMode;
+}
+
+void SVF::SetFilterSampleRate(double newSampleRate){
+  sampleRate = newSampleRate;
+  fir->SetFilterSamplerate(sampleRate * (double)(oversamplingFactor));
+  fir->SetFilterCutoff((sampleRate / (double)(oversamplingFactor)));
 }
 
 double SVF::GetFilterCutoff(){
@@ -72,6 +89,10 @@ double SVF::GetFilterOutput(){
 
 int SVF::GetFilterMode(){
   return filterMode;
+}
+
+double SVF::GetFilterSampleRate(){
+  return sampleRate;
 }
 
 void SVF::SVFfilter(double input){
@@ -101,9 +122,9 @@ void SVF::SVFfilter(double input){
   // with oversampling
   for(int nn = 0; nn < oversamplingFactor; nn++){
     hp = input - (2.0*fb_prime-1.0)*bp - lp + 1.0e-6*noise;
-    bp += dt_prime*hp;
+    bp += (dt_prime / oversamplingFactor) * hp;
     bp = std::tanh(bp);
-    lp += dt_prime*bp;  
+    lp += (dt_prime / oversamplingFactor) * bp;  
     lp = std::tanh(lp);
     
     switch(filterMode){
@@ -121,10 +142,11 @@ void SVF::SVFfilter(double input){
     
     default:
       out = 0.0;
-    }    
+    }
+
+    // downsampling filter
+    out = fir->FIRfilter(out);
   }
-  
-  // downsample to output
 }
 
 double SVF::GetFilterLowpass(){

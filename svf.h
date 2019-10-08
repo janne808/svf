@@ -3,10 +3,12 @@
 #ifndef __dspsvfh__
 #define __dspsvfh__
 
+#include "fir.h"
+
 class SVF{
 public:
   // constructor/destructor
-  SVF(double newCutoff, double newResonance, int newOversamplingFactor, int newFilterMode);
+  SVF(double newCutoff, double newResonance, int newOversamplingFactor, int newFilterMode, double newSampleRate);
   SVF();
   ~SVF();
 
@@ -15,12 +17,14 @@ public:
   void SetFilterResonance(double newResonance);
   void SetFilterOversamplingFactor(int newOversamplingFactor);
   void SetFilterMode(int newFilterMode);
+  void SetFilterSampleRate(double newSampleRate);
 
   // get filter parameters
   double GetFilterCutoff();
   double GetFilterResonance();
   int GetFilterOversamplingFactor();  
   int GetFilterMode();  
+  double GetFilterSampleRate();
   
   // tick filter state
   void SVFfilter(double input);
@@ -39,6 +43,7 @@ private:
   double Resonance;
   int oversamplingFactor;
   int filterMode;
+  double sampleRate;
 
   // filter state
   double lp;
@@ -47,6 +52,9 @@ private:
 
   // filter output
   double out;
+
+  // FIR downsampling filter
+  FIRLowpass *fir;
 };
 
 #endif

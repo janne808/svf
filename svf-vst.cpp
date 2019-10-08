@@ -27,7 +27,7 @@ SVFPlugin::SVFPlugin (audioMasterCallback audioMaster)
 	vst_strncpy (programName, "Default", kVstMaxProgNameLen);	// default program name
 
 	// instantiate SVF class
-	svf = new SVF((double)(fCutoff), (double)(fResonance), 1, 0);
+	svf = new SVF((double)(fCutoff), (double)(fResonance), 4, 0, (double)(fSampleRate));
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -40,6 +40,7 @@ SVFPlugin::~SVFPlugin ()
 void SVFPlugin::setSampleRate (float sampleRate)
 {
   fSampleRate = sampleRate;
+  svf->SetFilterSampleRate(fSampleRate);
 }
 
 //-------------------------------------------------------------------------------------------------------

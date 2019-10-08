@@ -20,7 +20,7 @@ FIRLowpass::FIRLowpass(double newSamplerate, double newCutoff, int newOrder)
   ringBufferIndex = 0;
   ringBuffer = new double[order];
 
-  for(int n=0; n++; n<order){
+  for(int n=0; n<order; n++){
     ringBuffer[n] = 0.0;
   }
 
@@ -45,7 +45,7 @@ FIRLowpass::FIRLowpass()
   ringBufferIndex = 0;
   ringBuffer = new double[order];
 
-  for(int n=0; n++; n<order){
+  for(int n=0; n<order; n++){
     ringBuffer[n] = 0.0;
   }
 
@@ -148,31 +148,31 @@ void FIRLowpass::ComputeImpulseResponse(){
   double ii;
   
   // set cutoff frequency in radians
-  omega_c = (double)(cutoff/samplerate)*2.0*M_PI;
+  omega_c = (double)(cutoff/samplerate) * 2.0 * M_PI;
 
   // compute truncated ideal impulse response
   for(int n=0; n<order; n++){
     // compute index as -M..M and avoid NaN at impulse peak
-    ii=(double)(n)-1.0-(double)(floor((double)(order)/2.0))+1.0e-9;
+    ii = (double)(n) - 1.0 - (double)(floor((double)(order)/2.0)) + 1.0e-9;
 
     // sample sinc function
-    h_d[n]=omega_c*std::sin((double)(omega_c*ii))/(double)(omega_c*ii);
+    h_d[n] = omega_c * std::sin((double)(omega_c * ii))/(double)(omega_c * ii);
   }
 
   // compute windowing function
   for(int n=0; n<order; n++){
     // compute index as -M..M and avoid NaN at impulse peak
-    ii=(double)(n)-1.0-(double)(floor((double)(order)/2.0))+1.0e-9;
+    ii = (double)(n) - 1.0 - (double)(floor((double)(order) / 2.0)) + 1.0e-9;
 
     // hanning window function
-    w[n]=std::cos(M_PI*ii/(double)(order));
-    w[n]*=w[n];
+    w[n] = std::cos(M_PI * ii/(double)(order));
+    w[n] *= w[n];
   }
 
   // compute windowed ideal impulse function
   for(int n=0; n<order; n++){
     // window truncated ideal impulse response
-    h[n]=w[n]*h_d[n];
+    h[n] = w[n] * h_d[n];
   }
 }
 
