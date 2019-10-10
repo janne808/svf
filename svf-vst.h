@@ -37,8 +37,11 @@ protected:
   float fGain;
   float fCutoff;
   float fResonance;
-
+  float fMode;
+  
   float fSampleRate;
+  float fOversamplingFactor;
+  int iOversamplingFactor;
   
   char programName[kVstMaxProgNameLen + 1];
 

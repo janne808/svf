@@ -100,7 +100,7 @@ void SVF::SVFfilter(double input){
   double noise;
 
   // integration rate
-  double dt = 0.001+1.75*(cutoffFrequency*cutoffFrequency*
+  double dt = 0.001+2.25*(cutoffFrequency*cutoffFrequency*
 			  cutoffFrequency*cutoffFrequency);
 
   // feedback amount
@@ -112,7 +112,7 @@ void SVF::SVFfilter(double input){
 
   // smooth parameter changes
   dt_prime = (dt * (1.0-0.999)) + (dt_prime * 0.999); 
-  fb_prime = (fb * (1.0-0.999)) + (fb_prime * 0.999); 
+  fb_prime = (fb * (1.0-0.993)) + (fb_prime * 0.993); 
    
   // update noise terms
   noise = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
